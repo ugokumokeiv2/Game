@@ -78,8 +78,8 @@ body{
 
 #saveload {
     background: #333;
-    width: 800px;
-    height: 600px;
+    width: 100%;
+    height: auto;
     box-sizing: border-box;
     overflow: hidden;
     flex-direction: row;
@@ -133,8 +133,8 @@ canvas {
 }
 
 #saveData {
-    width:100%;
-    height: auto;
+    width: 800px;
+    height: 600px;
     box-sizing:border-box;
     flex:1;
     resize: none;

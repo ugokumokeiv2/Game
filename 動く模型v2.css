@@ -237,4 +237,9 @@ button {
     #runScene {
         order:1;
     }
+
+    #load {
+        display:flex;
+        flex-direction:row;
+    }
 }

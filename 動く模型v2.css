@@ -158,6 +158,14 @@ button {
     margin-right:6px;
 }
 
+.runIcon {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    position: relative;
+}
+
 .objectIcon {
     display:inline-block;
     width:10px;
@@ -177,6 +185,36 @@ button {
 
 .motorIcon {
     border-color:green;
+}
+
+#startBtn::before {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 13px;
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 20px solid white;
+}
+
+#stopBtn::before,
+#stopBtn::after {
+    content: "";
+    position: absolute;
+    top: 10px;
+    width: 6px;
+    height: 20px;
+    background: white;
+}
+
+#stopBtn::before {
+    left: 11px;
+}
+
+#stopBtn::after {
+    left: 23px;
 }
 
 #editor,

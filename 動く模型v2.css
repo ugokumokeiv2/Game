@@ -83,7 +83,7 @@ body{
     height: 600px;
     box-sizing: border-box;
     overflow: hidden;
-    display: flex;
+    display: none;
     flex-direction: row;
 }
 

@@ -126,9 +126,11 @@ canvas {
 }
 
 #saveData {
-    width: 800px;
-    height: 600px;
-    resize: both;
+    width: 100%;
+    max-width: 100%;
+    min-height: 300px;
+    height: 60vh;
+    resize: vertical;
     font-family: monospace;
     background: black;
     color:greenyellow;

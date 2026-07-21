@@ -476,6 +476,7 @@ function drawRects() {
         DOM.ctx.editCtx.lineWidth = 1;
         DOM.ctx.editCtx.fillRect(rect.left * CONFIG.cell, rect.top * CONFIG.cell, rect.width * CONFIG.cell, rect.height * CONFIG.cell);
         DOM.ctx.editCtx.strokeStyle = base.replace("0.4", "0.8");
+        DOM.ctx.editCtx.fillStyle = base;
         DOM.ctx.editCtx.lineWidth = 4;
         DOM.ctx.editCtx.strokeRect(rect.left * CONFIG.cell, rect.top * CONFIG.cell, rect.width * CONFIG.cell, rect.height * CONFIG.cell);
     }
@@ -513,6 +514,7 @@ function drawRunObjects() {
         const vertices = shape.m_vertices;
 
         DOM.ctx.runCtx.fillStyle = base;
+        DOM.ctx.runCtx.strokeStyle = base.replace("0.4", "0.8");
         DOM.ctx.runCtx.beginPath();
 
         const first = body.getWorldPoint(vertices[0]);

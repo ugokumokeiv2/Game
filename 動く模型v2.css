@@ -83,7 +83,6 @@ body{
     height: 600px;
     box-sizing: border-box;
     overflow: hidden;
-    display: none;
     flex-direction: row;
 }
 
@@ -136,8 +135,9 @@ canvas {
 
 #saveData {
     width:100%;
-    height: calc(100% - 80px);
+    height: auto;
     box-sizing:border-box;
+    flex:1;
     resize: none;
     font-family: monospace;
     background: black;

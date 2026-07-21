@@ -83,8 +83,8 @@ body{
     height: 600px;
     box-sizing: border-box;
     overflow: hidden;
-    display: grid;
-    grid-template-rows: auto 1fr;
+    display: flex;
+    flex-direction: row;
 }
 
 .groupRow {
@@ -247,6 +247,6 @@ button {
 
     #load {
         display:flex;
-        flex-direction:row;
+        flex-direction:column;
     }
 }

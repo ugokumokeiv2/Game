@@ -794,6 +794,8 @@ function handleDeleteOfAllClick() {
     if (STATE.mode === "edit") {
         WORLD.objects.length = 0;
         WORLD.joints.length = 0;
+        STATE.selectedRect = null;
+        STATE.selectedRectOfJoint = null;
     }
 }
 

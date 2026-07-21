@@ -81,7 +81,8 @@ body{
     background: #333;
     width:min(800px, 100%);
     box-sizing:border-box;
-    overflow:hidden;
+    max-height: calc(100vh - 100px);
+    overflow:auto;
 }
 
 .groupRow {
@@ -133,7 +134,8 @@ canvas {
 
 #saveData {
     width:100%;
-    height:600px;
+    height: min(60vh, 600px);
+    max-height: calc(100vh - 180px);
     box-sizing:border-box;
     resize: vertical;
     font-family: monospace;

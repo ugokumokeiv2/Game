@@ -311,24 +311,6 @@ function getPointerPos(e, canvas){
     };
 }
 
-function getCanvasSize(){
-    const maxWidth = window.innerWidth;
-    const maxHeight = window.innerHeight * 0.7;
-
-    let width = maxWidth;
-    let height = width * 3 / 4;
-
-    if(height > maxHeight){
-        height = maxHeight;
-        width = height * 4 / 3;
-    }
-
-    return {
-        width: Math.floor(width),
-        height: Math.floor(height)
-    };
-}
-
 function editToWorld(x, y) {
     return {
         x: x * CONFIG.repaircell + CONFIG.xoffset,

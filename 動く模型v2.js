@@ -18,6 +18,7 @@ const DOM = {
         motor: document.querySelector('#motor'),
         select: document.querySelector('#sel'),
         create: document.querySelector('#cre'),
+        alldelete: document.querySelector('#alldel'),
         run: document.querySelector('#runBtn'),
         edit: document.querySelector('#editBtn'),
         load: document.querySelector('#loadBtn'),
@@ -789,6 +790,13 @@ function handleMotorClick() {
     }
 }
 
+function handleDeleteOfAllClick() {
+    if (STATE.mode === "edit") {
+        WORLD.objects.length = 0;
+        WORLD.joints.length = 0;
+    }
+}
+
 function handleDeleteClick() {
     if (STATE.mode === "edit") {
         DOM.menus.selectMenu.style.display = "none";
@@ -921,6 +929,7 @@ DOM.buttons.fix.addEventListener("click", handleFixClick);
 DOM.buttons.hinge.addEventListener("click", handleHingeClick);
 DOM.buttons.motor.addEventListener("click", handleMotorClick);
 DOM.buttons.select.addEventListener("click", handleSelectClick);
+DOM.buttons.alldelete.addEventListener("click", handleDeleteOfAllClick);
 
 DOM.buttons.run.addEventListener("click", () => setMode("run"));
 DOM.buttons.edit.addEventListener("click", () => setMode("edit"));

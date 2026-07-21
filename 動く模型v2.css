@@ -83,6 +83,8 @@ body{
     height: 600px;
     box-sizing: border-box;
     overflow: hidden;
+    display: grid;
+    grid-template-rows: auto 1fr;
 }
 
 .groupRow {
@@ -134,10 +136,9 @@ canvas {
 
 #saveData {
     width:100%;
-    height: min(60vh, 600px);
-    max-height: calc(100vh - 180px);
+    height: calc(100% - 80px);
     box-sizing:border-box;
-    resize: vertical;
+    resize: none;
     font-family: monospace;
     background: black;
     color:greenyellow;
@@ -201,6 +202,7 @@ button {
         width: 100%;
         max-width: 100%;
         height: auto;
+        display: block;
     }
 
     #editor {

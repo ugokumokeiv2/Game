@@ -515,6 +515,7 @@ function drawRunObjects() {
 
         DOM.ctx.runCtx.fillStyle = base;
         DOM.ctx.runCtx.strokeStyle = base.replace("0.4", "0.8");
+        DOM.ctx.runCtx.lineWidth = 4;
         DOM.ctx.runCtx.beginPath();
 
         const first = body.getWorldPoint(vertices[0]);

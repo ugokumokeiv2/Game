@@ -77,7 +77,6 @@ body{
 }
 
 #saveload {
-    display: none;
     background: #333;
     width: 800px;
     height: 600px;

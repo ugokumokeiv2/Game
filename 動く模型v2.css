@@ -148,6 +148,11 @@ button {
     color: white;
 }
 
+#startBtn,
+#stopBtn {
+    position: relative;
+}
+
 .jointIcon {
     display:inline-block;
     width:8px;

@@ -975,7 +975,7 @@ function loop() {
         }
         DOM.ctx.runCtx.clearRect(0, 0, DOM.runScene.width, DOM.runScene.height);
         DOM.ctx.runCtx.strokeStyle = "white";
-        DOM.ctx.runCtx.lineWidth = 2;
+        DOM.ctx.runCtx.lineWidth = 4;
         DOM.ctx.runCtx.strokeRect(0, 0, DOM.runScene.width, DOM.runScene.height);
         DOM.ctx.runCtx.lineWidth = 1;
         DOM.ctx.runCtx.strokeRect(150 , 500 , 500 , 120);

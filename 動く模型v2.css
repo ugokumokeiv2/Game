@@ -126,10 +126,8 @@ canvas {
 }
 
 #saveData {
-    width: 100%;
-    max-width: 100%;
-    min-height: 300px;
-    height: 60vh;
+    width: 800px;
+    height: 600px;
     resize: vertical;
     font-family: monospace;
     background: black;
@@ -202,6 +200,13 @@ button {
         order:1;
     }
 
+
+    #saveData {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 300px !important;
+        height: 60vh !important;
+    }
 
     #run {
         flex-direction:column;

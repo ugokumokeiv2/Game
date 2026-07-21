@@ -75,7 +75,7 @@ body{
 #saveload {
     display: none;
     background: #333;
-    width: 100%;
+    box-sizing:border-box;
 }
 
 .groupRow {

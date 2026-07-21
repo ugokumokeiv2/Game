@@ -132,8 +132,6 @@ const WORLD = {
     mouseBody: null
 }
 
-let runLoopCounter = 0;
-
 class Rect {
     static count = 0;
     constructor(left, top, width, height, data = null) {

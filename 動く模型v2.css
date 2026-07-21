@@ -75,6 +75,8 @@ body{
 #saveload {
     display: none;
     background: #333;
+    width:800px;
+    max-width:100%;
     box-sizing:border-box;
 }
 
@@ -126,8 +128,9 @@ canvas {
 }
 
 #saveData {
-    width: 800px;
-    height: 600px;
+    width:100%;
+    height:600px;
+    box-sizing:border-box;
     resize: vertical;
     font-family: monospace;
     background: black;

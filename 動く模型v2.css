@@ -10,6 +10,10 @@ body{
     background:#333;
 }
 
+* {
+    box-sizing:border-box;
+}
+
 #editor {
     display:flex;
     flex-direction: row; 
@@ -75,9 +79,9 @@ body{
 #saveload {
     display: none;
     background: #333;
-    width:800px;
-    max-width:100%;
+    width:min(800px, 100%);
     box-sizing:border-box;
+    overflow:hidden;
 }
 
 .groupRow {
@@ -186,6 +190,13 @@ button {
 }
 
 @media (max-width:600px) {
+    html,body{
+        justify-content:flex-start;
+    }
+
+    #saveload{
+        margin-top:10px;
+    }
 
     #editor {
         flex-direction:column;

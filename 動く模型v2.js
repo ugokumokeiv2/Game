@@ -330,20 +330,11 @@ function getCanvasSize(){
     };
 }
 
-
-function drawGrid() {
-    DOM.ctx.editCtx.beginPath();
-    DOM.ctx.editCtx.lineWidth = 1;
-    DOM.ctx.editCtx.strokeStyle = '#ccc';
-    for (let y = 0; y <= CONFIG.rows; y++) {
-        DOM.ctx.editCtx.moveTo(0, y * CONFIG.cell);
-        DOM.ctx.editCtx.lineTo(DOM.editScene.width, y * CONFIG.cell);
-    }
-    for (let x = 0; x <= CONFIG.cols; x++) {
-        DOM.ctx.editCtx.moveTo(x * CONFIG.cell, 0);
-        DOM.ctx.editCtx.lineTo(x * CONFIG.cell, DOM.editScene.height);
-    }
-    DOM.ctx.editCtx.stroke();
+function editToWorld(x, y) {
+    return {
+        x: x * CONFIG.repaircell + CONFIG.xoffset,
+        y: y * CONFIG.repaircell + CONFIG.yoffset,
+    };
 }
 
 function makeBlock(){
@@ -356,407 +347,6 @@ function makeBlock(){
     let width = right - left + 1;
     let height = bottom - top + 1;
     return {left, top, width, height};
-}
-
-function editToWorld(x, y) {
-    return {
-        x: x * CONFIG.repaircell + CONFIG.xoffset,
-        y: y * CONFIG.repaircell + CONFIG.yoffset,
-    };
-}
-
-function makeJoint() {
-    for (let i = 0; i < WORLD.objects.length; i++) {
-        WORLD.objects[i].selectedJoint = false;
-    }
-
-    STATE.selectedRectOfJoint = [];
-
-    for (let i = WORLD.objects.length - 1; i >= 0; i--) {
-        const rect = WORLD.objects[i];
-
-        if (
-            STATE.mouse.cellX >= rect.left &&
-            STATE.mouse.cellX < rect.left + rect.width &&
-            STATE.mouse.cellY >= rect.top &&
-            STATE.mouse.cellY < rect.top + rect.height
-        ) {
-            STATE.selectedRectOfJoint.push(rect);
-            rect.selectedJoint = true;
-        }
-    }
-    
-    STATE.selectedRectOfJoint.sort((a, b) => a.z - b.z);
-    
-    let rectA = null;
-    let rectB = null;
-    let type = null;
-    let options = {};
-
-    if (STATE.selectedRectOfJoint.length >= 2) {
-        rectA = STATE.selectedRectOfJoint[0];
-        rectB = STATE.selectedRectOfJoint[1];
-        if ( STATE.rawtype === "fix" ) {
-            type = "fix";
-            options = { 
-                relativeAngle: rectB.angle - rectA.angle
-            };
-        } else if ( STATE.rawtype === "hinge" ) { 
-            type = "hinge";
-            options = {};
-        } else if ( STATE.rawtype === "motor" ) {
-            type = "motor";
-            options = { 
-                speed: -3,
-                maxTorque: 100
-            };
-        }
-        WORLD.joints.push(
-            new Joint(
-                type,
-                rectA.id,
-                rectB.id,
-                STATE.mouse.cellX + 0.5,
-                STATE.mouse.cellY + 0.5,
-                options,
-            )
-        );
-    }else{
-        return
-    }
-}
-
-function drawRects() {
-    const sorted = [ ...WORLD.objects ].sort((a, b) => a.z - b.z);
-    for (let i = 0; i < sorted.length; i++) {
-        const rect = sorted[i];
-        const base = groupColors[rect.group];
-        DOM.ctx.editCtx.fillStyle = base;
-        DOM.ctx.editCtx.lineWidth = 1;
-        DOM.ctx.editCtx.fillRect(rect.left * CONFIG.cell, rect.top * CONFIG.cell, rect.width * CONFIG.cell, rect.height * CONFIG.cell);
-        DOM.ctx.editCtx.strokeStyle = base.replace("0.4", "0.8");
-        DOM.ctx.editCtx.lineWidth = 4;
-        DOM.ctx.editCtx.strokeRect(rect.left * CONFIG.cell, rect.top * CONFIG.cell, rect.width * CONFIG.cell, rect.height * CONFIG.cell);
-    }
-}
-
-function drawJoints() {
-    DOM.ctx.editCtx.lineWidth = 2;
-    for (let i = 0; i < WORLD.joints.length; i++){
-        if ( WORLD.joints[i].type === "fix") {
-            DOM.ctx.editCtx.strokeStyle = 'red';
-        } else if (WORLD.joints[i].type === "hinge") {
-            DOM.ctx.editCtx.strokeStyle = 'blue';
-        } else if (WORLD.joints[i].type === "motor" ) {
-            DOM.ctx.editCtx.strokeStyle = 'green';
-        }
-        DOM.ctx.editCtx.beginPath();
-        DOM.ctx.editCtx.arc(
-            WORLD.joints[i].x * CONFIG.cell,
-            WORLD.joints[i].y * CONFIG.cell,
-            5,
-            0,
-            Math.PI * 2
-            
-        );
-        DOM.ctx.editCtx.stroke();
-    }
-}
-
-function resetRunObjects() {
-    resetWorld();
-
-    if (STATE.mode === "run") {
-        WORLD.runObjects.push(...WORLD.objects.map(r => new RunObject(r)));
-        WORLD.runJoints.push(...WORLD.joints.map(j => new RunJoint(j)));
-    }
-}
-
-function mouseMove(e) {
-    if(STATE.mode === "edit") {
-        const pos = getPointerPos(e, DOM.editScene);
-
-        STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
-        STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
-
-        STATE.mouse.endX = STATE.mouse.cellX;
-        STATE.mouse.endY = STATE.mouse.cellY;
-    }else if(STATE.mode === "run") {
-        const pos = getPointerPos(e, DOM.runScene);
-
-        STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
-        STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
-        runMode(e);
-    }
-}
-
-function mouseDown(e) {
-    STATE.mouse.isDown = true;
-    if(STATE.mode === "edit") {
-        editMode(e);
-        const pos = getPointerPos(e, DOM.editScene);
-
-        STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
-        STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
-
-        if(STATE.tool === "create") {
-            STATE.mouse.startX = Math.floor(pos.x / CONFIG.cell);;
-            STATE.mouse.startY = Math.floor(pos.y / CONFIG.cell);;
-        }
-    }else if(STATE.mode === "run") {
-        const pos = getPointerPos(e, DOM.runScene);
-
-        STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
-        STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
-        runMode(e);
-    }
-}
-
-function mouseUp(e) {
-    if(!STATE.mouse.isDown) return;
-    STATE.mouse.isDown = false;
-    if(STATE.mode === "edit") {
-        if(STATE.tool === "create") {
-            const pos = getPointerPos(e, DOM.editScene);
-
-            STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
-            STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
-
-            STATE.mouse.endX = Math.floor(pos.x / CONFIG.cell);;
-            STATE.mouse.endY = Math.floor(pos.y / CONFIG.cell);;
-
-            const rect = makeBlock();
-            WORLD.objects.push(new Rect(rect.left, rect.top, rect.width, rect.height));
-
-            STATE.mouse.startX = null;
-            STATE.mouse.startY = null;
-            STATE.mouse.endX = null;
-            STATE.mouse.endY = null;
-        }
-    
-    }else if(STATE.mode === "run") {
-        const pos = getPointerPos(e, DOM.runScene);
-
-        STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
-        STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
-        runMode(e);
-    }
-}
-
-function handleCreateClick() {
-    if (STATE.mode === "edit") {
-        STATE.tool = "create";
-    }
-}
-
-function handleDeleteClick() {
-    if (STATE.mode === "edit") {
-        DOM.menus.selectMenu.style.display = "none";
-        for (let i = WORLD.joints.length - 1; i >= 0; i--) {
-            const joint = WORLD.joints[i];
-            if (joint.aId === STATE.selectedRect.id || joint.bId === STATE.selectedRect.id) {
-                WORLD.joints.splice(i, 1);
-            }
-        }
-
-        const index = WORLD.objects.indexOf(STATE.selectedRect);
-
-        if (index !== -1) {
-            WORLD.objects.splice(index, 1);
-        }
-    }
-    STATE.selectedRect = null;
-}
-
-function handleSelectClick() {
-    if (STATE.mode === "edit") {
-        DOM.menus.selectMenu.style.display = "none";
-        STATE.tool = "select";
-    }
-}
-
-function handleFixClick() {
-    if (STATE.mode === "edit") {
-        DOM.menus.selectMenu.style.display = "none";
-        STATE.tool = "joint";
-        STATE.rawtype = "fix";
-    }
-}
-
-function handleHingeClick() {
-    if (STATE.mode === "edit") {
-        DOM.menus.selectMenu.style.display = "none";
-        STATE.tool = "joint";
-        STATE.rawtype = "hinge";
-    }
-}
-
-function handleMotorClick() {
-    if (STATE.mode === "edit") {
-        DOM.menus.selectMenu.style.display = "none";
-        STATE.tool = "joint";
-        STATE.rawtype = "motor";
-    }
-}
-
-function editMode(e) {
-    if (STATE.tool === "select") {
-
-        for (let i = 0; i < WORLD.objects.length; i++) {
-            WORLD.objects[i].selected = false;
-        }
-
-        STATE.selectedRect = null;
-
-        for (let i = WORLD.objects.length - 1; i >= 0; i--) {
-            const rect = WORLD.objects[i];
-            if (
-                STATE.mouse.cellX >= rect.left && 
-                STATE.mouse.cellX < rect.left + rect.width && 
-                STATE.mouse.cellY >= rect.top && 
-                STATE.mouse.cellY < rect.top + rect.height
-            ) {
-                STATE.selectedRect = rect;
-                rect.selected = true;
-
-                DOM.menus.selectMenu.style.display = "flex";
-                DOM.menus.selectMenu.style.left =
-                    e.pageX + "px";
-                DOM.menus.selectMenu.style.top =
-                    e.pageY + "px";
-                DOM.menus.name.value = rect.name;
-                break;
-            }else{
-                DOM.menus.selectMenu.style.display = "none";
-            }
-        }
-        
-    }else if (STATE.tool === "joint") {
-        makeJoint();
-        DOM.menus.selectMenu.style.display = "none";
-    }
-}
-
-function getBodyAtMouse(mouseX, mouseY) {
-    const mouse = planck.Vec2(
-        mouseX / CONFIG.SCALE,
-        mouseY / CONFIG.SCALE
-    );
-
-    let result = null;
-
-    const aabb = planck.AABB(
-        mouse,
-        mouse
-    );
-
-    physics.world.queryAABB(aabb, fixture => {
-        if (fixture.testPoint(mouse)) {
-            result = fixture.getBody();
-            return false;
-        }
-
-        return true;
-    });
-
-    return result;
-}
-
-function runMode(e) {
-    const pos = getPointerPos(e, DOM.runScene);
-    if (e.type === "pointerdown") {
-        DOM.runScene.setPointerCapture(e.pointerId);
-        const body = getBodyAtMouse(
-            pos.x,
-            pos.y
-        );
-        if (body) {
-            STATE.mouse.grabBody = body;
-
-            const mouse = planck.Vec2(
-                pos.x / CONFIG.SCALE,
-                pos.y / CONFIG.SCALE
-            );
-
-            const jointDef = planck.MouseJoint(
-                {
-                    maxForce: 1000 * body.getMass(),
-                    stiffness: 1000,
-                    damping: 0.1
-                },
-                WORLD.mouseBody,
-                body,
-                mouse
-            );
-        const mouseJoint = physics.world.createJoint(jointDef);
-        STATE.mouse.mouseJoint = mouseJoint;
-        }
-    }else if (e.type === "pointermove") {
-        if (STATE.mouse.mouseJoint) {
-            STATE.mouse.mouseJoint.setTarget(
-                planck.Vec2(
-                    pos.x / CONFIG.SCALE,
-                    pos.y / CONFIG.SCALE
-                )
-            );
-        }
-    }else if (e.type === "pointerup") {
-        DOM.runScene.releasePointerCapture(e.pointerId);
-        if (STATE.mouse.mouseJoint) {
-            physics.world.destroyJoint(
-                STATE.mouse.mouseJoint
-            );
-        }
-        STATE.mouse.mouseJoint = null;
-        STATE.mouse.grabBody = null;
-    }
-}
-
-function handleStartClick() {
-    if (STATE.mode === "run") {
-        STATE.modeInRun = "start";
-    }
-}
-
-function handleStopClick() {
-    if (STATE.mode === "run") {
-        STATE.modeInRun = "pause";
-    }
-}
-
-function handleResetClick(){
-    if (STATE.mode === "run") {
-        STATE.modeInRun = "pause";
-
-        resetWorld();
-        resetRunObjects();
-
-        STATE.modeInRun = "run";
-    }
-}
-
-function updateUI() {
-    if (STATE.mode === "edit") {
-        DOM.editor.style.display = "flex";
-        DOM.run.style.display = "none";
-        DOM.saveload.style.display = "none";
-    }else if (STATE.mode === "run") {
-        DOM.menus.selectMenu.style.display = "none";
-        DOM.editor.style.display = "none";
-        DOM.run.style.display = "flex";
-        DOM.saveload.style.display = "none";
-    }else if (STATE.mode === "load") {
-        DOM.menus.selectMenu.style.display = "none";
-        DOM.editor.style.display = "none";
-        DOM.run.style.display = "none";
-        DOM.saveload.style.display = "flex";
-    }
-}
-
-function setMode(m) {
-    STATE.mode = m;
-    updateUI();
-    resetRunObjects();
 }
 
 function createFloor() {
@@ -840,8 +430,79 @@ function createFloor() {
     );
 }
 
-function drawRunObjects() {
+function resetWorld() {
+    physics.world = planck.World({
+        gravity: planck.Vec2(0,10)
+    });
 
+    WORLD.mouseBody = physics.world.createBody();
+    WORLD.bodyMap = {};
+    WORLD.runObjects.length = 0;
+    WORLD.runJoints.length = 0;
+    createFloor();
+}
+
+function resetRunObjects() {
+    resetWorld();
+
+    if (STATE.mode === "run") {
+        WORLD.runObjects.push(...WORLD.objects.map(r => new RunObject(r)));
+        WORLD.runJoints.push(...WORLD.joints.map(j => new RunJoint(j)));
+    }
+}
+
+function drawGrid() {
+    DOM.ctx.editCtx.beginPath();
+    DOM.ctx.editCtx.lineWidth = 1;
+    DOM.ctx.editCtx.strokeStyle = '#ccc';
+    for (let y = 0; y <= CONFIG.rows; y++) {
+        DOM.ctx.editCtx.moveTo(0, y * CONFIG.cell);
+        DOM.ctx.editCtx.lineTo(DOM.editScene.width, y * CONFIG.cell);
+    }
+    for (let x = 0; x <= CONFIG.cols; x++) {
+        DOM.ctx.editCtx.moveTo(x * CONFIG.cell, 0);
+        DOM.ctx.editCtx.lineTo(x * CONFIG.cell, DOM.editScene.height);
+    }
+    DOM.ctx.editCtx.stroke();
+}
+
+function drawRects() {
+    const sorted = [ ...WORLD.objects ].sort((a, b) => a.z - b.z);
+    for (let i = 0; i < sorted.length; i++) {
+        const rect = sorted[i];
+        const base = groupColors[rect.group];
+        DOM.ctx.editCtx.fillStyle = base;
+        DOM.ctx.editCtx.lineWidth = 1;
+        DOM.ctx.editCtx.fillRect(rect.left * CONFIG.cell, rect.top * CONFIG.cell, rect.width * CONFIG.cell, rect.height * CONFIG.cell);
+        DOM.ctx.editCtx.strokeStyle = base.replace("0.4", "0.8");
+        DOM.ctx.editCtx.lineWidth = 4;
+        DOM.ctx.editCtx.strokeRect(rect.left * CONFIG.cell, rect.top * CONFIG.cell, rect.width * CONFIG.cell, rect.height * CONFIG.cell);
+    }
+}
+
+function drawJoints() {
+    DOM.ctx.editCtx.lineWidth = 2;
+    for (let i = 0; i < WORLD.joints.length; i++){
+        if ( WORLD.joints[i].type === "fix") {
+            DOM.ctx.editCtx.strokeStyle = 'red';
+        } else if (WORLD.joints[i].type === "hinge") {
+            DOM.ctx.editCtx.strokeStyle = 'blue';
+        } else if (WORLD.joints[i].type === "motor" ) {
+            DOM.ctx.editCtx.strokeStyle = 'green';
+        }
+        DOM.ctx.editCtx.beginPath();
+        DOM.ctx.editCtx.arc(
+            WORLD.joints[i].x * CONFIG.cell,
+            WORLD.joints[i].y * CONFIG.cell,
+            5,
+            0,
+            Math.PI * 2
+        );
+        DOM.ctx.editCtx.stroke();
+    }
+}
+
+function drawRunObjects() {
     for (let i = 0; i < WORLD.runObjects.length; i++) {
         const body = WORLD.runObjects[i].body;
         const base = groupColors[WORLD.runObjects[i].group];
@@ -854,7 +515,6 @@ function drawRunObjects() {
         DOM.ctx.runCtx.beginPath();
 
         const first = body.getWorldPoint(vertices[0]);
-
         DOM.ctx.runCtx.moveTo(first.x * CONFIG.SCALE, first.y * CONFIG.SCALE);
 
         for(let j = 1; j < vertices.length; j++) {
@@ -868,18 +528,329 @@ function drawRunObjects() {
     }
 }
 
-function resetWorld() {
-    physics.world = planck.World({
-        gravity: planck.Vec2(0,10)
+function makeJoint() {
+    for (let i = 0; i < WORLD.objects.length; i++) {
+        WORLD.objects[i].selectedJoint = false;
+    }
+
+    STATE.selectedRectOfJoint = [];
+
+    for (let i = WORLD.objects.length - 1; i >= 0; i--) {
+        const rect = WORLD.objects[i];
+
+        if (
+            STATE.mouse.cellX >= rect.left &&
+            STATE.mouse.cellX < rect.left + rect.width &&
+            STATE.mouse.cellY >= rect.top &&
+            STATE.mouse.cellY < rect.top + rect.height
+        ) {
+            STATE.selectedRectOfJoint.push(rect);
+            rect.selectedJoint = true;
+        }
+    }
+    
+    STATE.selectedRectOfJoint.sort((a, b) => a.z - b.z);
+    
+    let rectA = null;
+    let rectB = null;
+    let type = null;
+    let options = {};
+
+    if (STATE.selectedRectOfJoint.length >= 2) {
+        rectA = STATE.selectedRectOfJoint[0];
+        rectB = STATE.selectedRectOfJoint[1];
+        if ( STATE.rawtype === "fix" ) {
+            type = "fix";
+            options = { 
+                relativeAngle: rectB.angle - rectA.angle
+            };
+        } else if ( STATE.rawtype === "hinge" ) { 
+            type = "hinge";
+            options = {};
+        } else if ( STATE.rawtype === "motor" ) {
+            type = "motor";
+            options = { 
+                speed: -3,
+                maxTorque: 100
+            };
+        }
+        WORLD.joints.push(
+            new Joint(
+                type,
+                rectA.id,
+                rectB.id,
+                STATE.mouse.cellX + 0.5,
+                STATE.mouse.cellY + 0.5,
+                options,
+            )
+        );
+    } else {
+        return;
+    }
+}
+
+function editMode(e) {
+    if (STATE.tool === "select") {
+        for (let i = 0; i < WORLD.objects.length; i++) {
+            WORLD.objects[i].selected = false;
+        }
+
+        STATE.selectedRect = null;
+
+        for (let i = WORLD.objects.length - 1; i >= 0; i--) {
+            const rect = WORLD.objects[i];
+            if (
+                STATE.mouse.cellX >= rect.left && 
+                STATE.mouse.cellX < rect.left + rect.width && 
+                STATE.mouse.cellY >= rect.top && 
+                STATE.mouse.cellY < rect.top + rect.height
+            ) {
+                STATE.selectedRect = rect;
+                rect.selected = true;
+
+                DOM.menus.selectMenu.style.display = "flex";
+                DOM.menus.selectMenu.style.left = e.pageX + "px";
+                DOM.menus.selectMenu.style.top = e.pageY + "px";
+                DOM.menus.name.value = rect.name;
+                break;
+            } else {
+                DOM.menus.selectMenu.style.display = "none";
+            }
+        }
+    } else if (STATE.tool === "joint") {
+        makeJoint();
+        DOM.menus.selectMenu.style.display = "none";
+    }
+}
+
+function getBodyAtMouse(mouseX, mouseY) {
+    const mouse = planck.Vec2(
+        mouseX / CONFIG.SCALE,
+        mouseY / CONFIG.SCALE
+    );
+
+    let result = null;
+    const aabb = planck.AABB(mouse, mouse);
+
+    physics.world.queryAABB(aabb, fixture => {
+        if (fixture.testPoint(mouse)) {
+            result = fixture.getBody();
+            return false;
+        }
+        return true;
     });
 
-    WORLD.mouseBody = physics.world.createBody();
+    return result;
+}
 
-    WORLD.bodyMap = {};
+function runMode(e) {
+    const pos = getPointerPos(e, DOM.runScene);
 
-    WORLD.runObjects.length = 0;
-    WORLD.runJoints.length = 0;
-    createFloor();
+    if (e.type === "pointerdown") {
+        DOM.runScene.setPointerCapture(e.pointerId);
+        const body = getBodyAtMouse(pos.x, pos.y);
+        if (body) {
+            STATE.mouse.grabBody = body;
+
+            const mouse = planck.Vec2(
+                pos.x / CONFIG.SCALE,
+                pos.y / CONFIG.SCALE
+            );
+
+            const jointDef = planck.MouseJoint(
+                {
+                    maxForce: 1000 * body.getMass(),
+                    stiffness: 1000,
+                    damping: 0.1
+                },
+                WORLD.mouseBody,
+                body,
+                mouse
+            );
+            const mouseJoint = physics.world.createJoint(jointDef);
+            STATE.mouse.mouseJoint = mouseJoint;
+        }
+    } else if (e.type === "pointermove") {
+        if (STATE.mouse.mouseJoint) {
+            STATE.mouse.mouseJoint.setTarget(
+                planck.Vec2(
+                    pos.x / CONFIG.SCALE,
+                    pos.y / CONFIG.SCALE
+                )
+            );
+        }
+    } else if (e.type === "pointerup") {
+        DOM.runScene.releasePointerCapture(e.pointerId);
+        if (STATE.mouse.mouseJoint) {
+            physics.world.destroyJoint(STATE.mouse.mouseJoint);
+        }
+        STATE.mouse.mouseJoint = null;
+        STATE.mouse.grabBody = null;
+    }
+}
+
+function mouseMove(e) {
+    if (STATE.mode === "edit") {
+        const pos = getPointerPos(e, DOM.editScene);
+        STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
+        STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
+        STATE.mouse.endX = STATE.mouse.cellX;
+        STATE.mouse.endY = STATE.mouse.cellY;
+    } else if (STATE.mode === "run") {
+        const pos = getPointerPos(e, DOM.runScene);
+        STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
+        STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
+        runMode(e);
+    }
+}
+
+function mouseDown(e) {
+    STATE.mouse.isDown = true;
+    if (STATE.mode === "edit") {
+        editMode(e);
+        const pos = getPointerPos(e, DOM.editScene);
+        STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
+        STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
+
+        if (STATE.tool === "create") {
+            STATE.mouse.startX = Math.floor(pos.x / CONFIG.cell);
+            STATE.mouse.startY = Math.floor(pos.y / CONFIG.cell);
+        }
+    } else if (STATE.mode === "run") {
+        const pos = getPointerPos(e, DOM.runScene);
+        STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
+        STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
+        runMode(e);
+    }
+}
+
+function mouseUp(e) {
+    if (!STATE.mouse.isDown) return;
+    STATE.mouse.isDown = false;
+
+    if (STATE.mode === "edit") {
+        if (STATE.tool === "create") {
+            const pos = getPointerPos(e, DOM.editScene);
+            STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
+            STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
+            STATE.mouse.endX = Math.floor(pos.x / CONFIG.cell);
+            STATE.mouse.endY = Math.floor(pos.y / CONFIG.cell);
+
+            const rect = makeBlock();
+            WORLD.objects.push(new Rect(rect.left, rect.top, rect.width, rect.height));
+
+            STATE.mouse.startX = null;
+            STATE.mouse.startY = null;
+            STATE.mouse.endX = null;
+            STATE.mouse.endY = null;
+        }
+    } else if (STATE.mode === "run") {
+        const pos = getPointerPos(e, DOM.runScene);
+        STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
+        STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
+        runMode(e);
+    }
+}
+
+function handleCreateClick() {
+    if (STATE.mode === "edit") {
+        STATE.tool = "create";
+    }
+}
+
+function handleSelectClick() {
+    if (STATE.mode === "edit") {
+        DOM.menus.selectMenu.style.display = "none";
+        STATE.tool = "select";
+    }
+}
+
+function handleFixClick() {
+    if (STATE.mode === "edit") {
+        DOM.menus.selectMenu.style.display = "none";
+        STATE.tool = "joint";
+        STATE.rawtype = "fix";
+    }
+}
+
+function handleHingeClick() {
+    if (STATE.mode === "edit") {
+        DOM.menus.selectMenu.style.display = "none";
+        STATE.tool = "joint";
+        STATE.rawtype = "hinge";
+    }
+}
+
+function handleMotorClick() {
+    if (STATE.mode === "edit") {
+        DOM.menus.selectMenu.style.display = "none";
+        STATE.tool = "joint";
+        STATE.rawtype = "motor";
+    }
+}
+
+function handleDeleteClick() {
+    if (STATE.mode === "edit") {
+        DOM.menus.selectMenu.style.display = "none";
+        for (let i = WORLD.joints.length - 1; i >= 0; i--) {
+            const joint = WORLD.joints[i];
+            if (joint.aId === STATE.selectedRect.id || joint.bId === STATE.selectedRect.id) {
+                WORLD.joints.splice(i, 1);
+            }
+        }
+
+        const index = WORLD.objects.indexOf(STATE.selectedRect);
+        if (index !== -1) {
+            WORLD.objects.splice(index, 1);
+        }
+    }
+
+    STATE.selectedRect = null;
+}
+
+function handleStartClick() {
+    if (STATE.mode === "run") {
+        STATE.modeInRun = "start";
+    }
+}
+
+function handleStopClick() {
+    if (STATE.mode === "run") {
+        STATE.modeInRun = "pause";
+    }
+}
+
+function handleResetClick(){
+    if (STATE.mode === "run") {
+        STATE.modeInRun = "pause";
+        resetWorld();
+        resetRunObjects();
+        STATE.modeInRun = "run";
+    }
+}
+
+function updateUI() {
+    if (STATE.mode === "edit") {
+        DOM.editor.style.display = "flex";
+        DOM.run.style.display = "none";
+        DOM.saveload.style.display = "none";
+    } else if (STATE.mode === "run") {
+        DOM.menus.selectMenu.style.display = "none";
+        DOM.editor.style.display = "none";
+        DOM.run.style.display = "flex";
+        DOM.saveload.style.display = "none";
+    } else if (STATE.mode === "load") {
+        DOM.menus.selectMenu.style.display = "none";
+        DOM.editor.style.display = "none";
+        DOM.run.style.display = "none";
+        DOM.saveload.style.display = "flex";
+    }
+}
+
+function setMode(m) {
+    STATE.mode = m;
+    updateUI();
+    resetRunObjects();
 }
 
 function handleLoadClick() {
@@ -888,9 +859,7 @@ function handleLoadClick() {
 
 function handleLoaderClick(e) {
     try{
-        const data = JSON.parse(
-            DOM.load.textbox.value
-        );
+        const data = JSON.parse(DOM.load.textbox.value);
 
         WORLD.objects.length = 0;
         WORLD.joints.length = 0;
@@ -972,13 +941,11 @@ DOM.menus.groupBtns.forEach(btn => {
         if (!STATE.selectedRect) return;
 
         STATE.selectedRect.group = Number(btn.dataset.group);
-
         DOM.menus.selectMenu.style.display = "none";
     });
 });
 
 DOM.buttons.delete.addEventListener("click", handleDeleteClick);
-
 DOM.buttons.load.addEventListener("click",handleLoadClick);
 DOM.buttons.loader.addEventListener("click",handleLoaderClick);
 
@@ -988,7 +955,7 @@ function loop() {
         drawRects();
         drawJoints();
         drawGrid();
-    }else if(STATE.mode === "run") {
+    } else if(STATE.mode === "run") {
         if (STATE.modeInRun === "start") {
             physics.world.step(1 / 60);
         }
@@ -1000,4 +967,6 @@ function loop() {
         drawRunObjects();
     }
     requestAnimationFrame(loop);
-}loop();
+}
+
+loop();

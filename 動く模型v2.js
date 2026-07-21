@@ -40,10 +40,6 @@ const DOM = {
     }
 }
 
-const DEVICE = {
-    isTouch: window.matchMedia("(pointer: coarse)").matches
-};
-
 const CONFIG = {
     cell : 20,
     repaircell: 6,

@@ -865,12 +865,6 @@ function handleLoaderClick(e) {
             WORLD.objects.push(rect);
         }
 
-        data.objects.forEach(obj => {
-            if(!GROUP_FILTER[obj.group]){
-                obj.group = -1;
-            }
-        });
-
         for(let j = 0; j < data.joints.length; j++){
             const joi = data.joints[j];
             const joint = new Joint(
@@ -882,8 +876,15 @@ function handleLoaderClick(e) {
                 joi.options,
                 joi
             );
+
             WORLD.joints.push(joint);
         }
+    
+        data.objects.forEach(obj => {
+            if(!GROUP_FILTER[obj.group]){
+                obj.group = -1;
+            }
+        });
     }catch(e){
         alert("入力ミスがあります");
         console.error(e);

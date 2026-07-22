@@ -884,7 +884,6 @@ function handleLoaderClick(e) {
         }
     }catch(e){
         alert("入力ミスがあります");
-        console.error(e);
     }
 }
 
@@ -893,7 +892,6 @@ function saveData(){
         objects: WORLD.objects,
         joints: WORLD.joints
     };
-    console.log(data);
     DOM.load.textbox.value =
         JSON.stringify(data, null, 2);
 }

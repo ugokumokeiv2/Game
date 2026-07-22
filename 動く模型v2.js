@@ -863,7 +863,7 @@ function handleLoaderClick(e) {
                 obj
             );
             WORLD.objects.push(rect);
-            if (obj.group < 1 ?? 7 < obj.group) {
+            if (obj.group > -1 ?? -7 > obj.group) {
                 console.log(obj.group);
             }
         }

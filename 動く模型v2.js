@@ -865,6 +865,12 @@ function handleLoaderClick(e) {
             WORLD.objects.push(rect);
         }
 
+        data.objects.forEach(obj => {
+            if(!GROUP_FILTER[obj.group]){
+                obj.group = -1;
+            }
+        });
+
         for(let j = 0; j < data.joints.length; j++){
             const joi = data.joints[j];
             const joint = new Joint(

@@ -76,6 +76,17 @@ body{
     gap: 8px;
 }
 
+#jointSelectMenu {
+    position: absolute;
+    display: none;
+    flex-direction: column;
+
+    background: rgb(54, 51, 51);
+    border: 1px solid black;
+    padding: 8px;
+    gap: 8px;
+}
+
 #saveload {
     background: #333;
     width: 100%;
@@ -155,8 +166,8 @@ button {
 
 .jointIcon {
     display:inline-block;
-    width:8px;
-    height:8px;
+    width:10px;
+    height:10px;
     border-radius:50%;
     background:transparent;
     border:2px solid;

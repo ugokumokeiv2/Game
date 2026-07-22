@@ -13,19 +13,25 @@ const DOM = {
     },
 
     buttons: {
+        create: document.querySelector('#cre'),
         fix: document.querySelector('#fix'),
         hinge: document.querySelector('#hinge'),
         motor: document.querySelector('#motor'),
         select: document.querySelector('#sel'),
-        create: document.querySelector('#cre'),
         alldelete: document.querySelector('#alldel'),
+
         run: document.querySelector('#runBtn'),
         edit: document.querySelector('#editBtn'),
         load: document.querySelector('#loadBtn'),
+
         start: document.querySelector('#startBtn'),
         stop: document.querySelector('#stopBtn'),
         reset: document.querySelector('#resetBtn'),
+
         delete: document.querySelector('#del'),
+
+        jointDelete: document.querySelector('#jointDel'),
+
         loader: document.querySelector('#load')
     },
 
@@ -33,6 +39,12 @@ const DOM = {
         name: document.querySelector('.name'),
         selectMenu: document.querySelector('#selectMenu'),
         groupBtns: document.querySelectorAll('.groupBtn')
+    },
+
+    jointMenus: {
+        jointName: document.querySelector('.jointName'),
+        jointSelectMenu: document.querySelector('#jointSelectMenu'),
+        jointTypeChangers: document.querySelectorAll('.jointTypeChanger')
     },
 
     load: {
@@ -46,14 +58,17 @@ const CONFIG = {
     SCALE: 50,
     xoffset: 150,
     yoffset: 320,
+
     editorSize: {
         width: 800,
         height: 600
     },
+
     runnerSize: {
         width: 800,
         height: 600
     },
+
     world: {
         motorPower: 0.01
     }
@@ -75,6 +90,7 @@ const STATE = {
     modeInRun: "pause",
 
     selectedRect: null,
+    selectedJoint: null,
     selectedRectOfJoint: [],
 
     world: {
@@ -214,6 +230,7 @@ class Joint {
         this.x = x;
         this.y = y;
         this.options = options;
+        this.selected = false;
         if(data) {
             Object.assign(this, data);
         }
@@ -569,13 +586,65 @@ function makeJoint() {
     }
 }
 
+function changeJointType(joint,newType){
+    joint.type = newType;
+
+    if(newType === "hinge"){
+        joint.options = {};
+    }
+
+    if(newType === "fix"){
+        const a = WORLD.objects.find(o=>o.id===joint.aId);
+        const b = WORLD.objects.find(o=>o.id===joint.bId);
+
+        joint.options = {
+            relativeAngle:b.angle-a.angle
+        };
+    }
+
+    if(newType === "motor"){
+        joint.options = {
+            speed:-3,
+            maxTorque:100
+        };
+    }
+}
+
 function editMode(e) {
     if (STATE.tool === "select") {
+        for (let i = 0; i < WORLD.joints.length; i++) {
+            WORLD.joints[i].selected = false;
+        }
+
         for (let i = 0; i < WORLD.objects.length; i++) {
             WORLD.objects[i].selected = false;
         }
 
         STATE.selectedRect = null;
+        STATE.selectedJoint = null;
+
+        for (let i = WORLD.joints.length - 1; i >= 0; i--) {
+            const joint = WORLD.joints[i];
+
+            if (
+                Math.floor(joint.x) === STATE.mouse.cellX &&
+                Math.floor(joint.y) === STATE.mouse.cellY
+            ) {
+                STATE.selectedJoint = joint;
+                break;
+            } else {
+                DOM.jointMenus.jointSelectMenu.style.display = "none";
+            }
+        }
+
+        if (STATE.selectedJoint) {
+            DOM.menus.selectMenu.style.display = "none";
+            DOM.jointMenus.jointSelectMenu.style.display = "flex";
+            DOM.jointMenus.jointSelectMenu.style.left = e.pageX + "px";
+            DOM.jointMenus.jointSelectMenu.style.top = e.pageY + "px";
+            DOM.jointMenus.jointName.value = STATE.selectedJoint.name;
+            return;
+        }
 
         for (let i = WORLD.objects.length - 1; i >= 0; i--) {
             const rect = WORLD.objects[i];
@@ -687,11 +756,10 @@ function mouseMove(e) {
 function mouseDown(e) {
     STATE.mouse.isDown = true;
     if (STATE.mode === "edit") {
-        editMode(e);
         const pos = getPointerPos(e, DOM.editScene);
         STATE.mouse.cellX = Math.floor(pos.x / CONFIG.cell);
         STATE.mouse.cellY = Math.floor(pos.y / CONFIG.cell);
-
+        editMode(e);
         if (STATE.tool === "create") {
             STATE.mouse.startX = Math.floor(pos.x / CONFIG.cell);
             STATE.mouse.startY = Math.floor(pos.y / CONFIG.cell);
@@ -797,6 +865,19 @@ function handleDeleteClick() {
     STATE.selectedRect = null;
 }
 
+function handleJointDeleteClick() {
+    if (STATE.mode === "edit") {
+        DOM.jointMenus.jointSelectMenu.style.display = "none";
+
+        const index = WORLD.joints.indexOf(STATE.selectedJoint);
+        if (index !== -1) {
+            WORLD.joints.splice(index, 1);
+        }
+    }
+
+    STATE.selectedRect = null;
+}
+
 function handleStartClick() {
     if (STATE.mode === "run") {
         STATE.modeInRun = "start";
@@ -825,11 +906,13 @@ function updateUI() {
         DOM.saveload.style.display = "none";
     } else if (STATE.mode === "run") {
         DOM.menus.selectMenu.style.display = "none";
+        DOM.jointMenus.jointSelectMenu.style.display = "none";
         DOM.editor.style.display = "none";
         DOM.run.style.display = "flex";
         DOM.saveload.style.display = "none";
     } else if (STATE.mode === "load") {
         DOM.menus.selectMenu.style.display = "none";
+        DOM.jointMenus.jointSelectMenu.style.display = "none";
         DOM.editor.style.display = "none";
         DOM.run.style.display = "none";
         DOM.saveload.style.display = "flex";
@@ -931,6 +1014,12 @@ DOM.menus.name.addEventListener("input", e=>{
     }
 });
 
+DOM.jointMenus.jointName.addEventListener("input", e=>{
+    if(STATE.selectedJoint){
+        STATE.selectedJoint.name = e.target.value;
+    }
+});
+
 DOM.menus.groupBtns.forEach(btn => {
     btn.addEventListener("click", () => {
         if (!STATE.selectedRect) return;
@@ -940,7 +1029,18 @@ DOM.menus.groupBtns.forEach(btn => {
     });
 });
 
+DOM.jointMenus.jointTypeChangers.forEach(btn=>{
+    btn.addEventListener("click",()=>{
+        const type = btn.dataset.joint;
+        changeJointType(STATE.selectedJoint,type);
+        DOM.jointMenus.jointSelectMenu.style.display="none";
+    });
+});
+
 DOM.buttons.delete.addEventListener("click", handleDeleteClick);
+DOM.buttons.jointDelete.addEventListener("click", handleJointDeleteClick);
+
+
 DOM.buttons.load.addEventListener("click",handleLoadClick);
 DOM.buttons.loader.addEventListener("click",handleLoaderClick);
 

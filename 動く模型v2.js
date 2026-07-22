@@ -862,10 +862,11 @@ function handleLoaderClick(e) {
                 obj.height,
                 obj
             );
-            WORLD.objects.push(rect);
-            if (obj.group > -1 ?? -7 > obj.group) {
-                console.log(obj.group);
+            if (obj.group > -1 || -7 > obj.group) {
+                obj.group = -1;
             }
+            WORLD.objects.push(rect);
+
         }
 
         for(let j = 0; j < data.joints.length; j++){

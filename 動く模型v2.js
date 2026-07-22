@@ -863,6 +863,9 @@ function handleLoaderClick(e) {
                 obj
             );
             WORLD.objects.push(rect);
+            if (obj.group < 1 ?? 7 < obj.group) {
+                console.log(obj.group);
+            }
         }
 
         for(let j = 0; j < data.joints.length; j++){

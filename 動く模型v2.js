@@ -1040,7 +1040,6 @@ DOM.jointMenus.jointTypeChangers.forEach(btn=>{
 DOM.buttons.delete.addEventListener("click", handleDeleteClick);
 DOM.buttons.jointDelete.addEventListener("click", handleJointDeleteClick);
 
-
 DOM.buttons.load.addEventListener("click",handleLoadClick);
 DOM.buttons.loader.addEventListener("click",handleLoaderClick);
 

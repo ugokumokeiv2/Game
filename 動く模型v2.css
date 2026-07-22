@@ -235,7 +235,7 @@ button {
 }
 
 #credit {
-    color:greenyellow;
+    color:#ddd;
 }
 
 @media (max-width:600px) {

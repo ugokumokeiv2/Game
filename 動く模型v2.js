@@ -855,6 +855,10 @@ function handleLoaderClick(e) {
 
         for(let i = 0; i < data.objects.length; i++){
             const obj = data.objects[i];
+            if (typeof obj.group !== "number" || obj.group > -1 || obj.group < -7) {
+                alert("error: groupを-1に書き換えました")
+                obj.group = -1;
+            }
             const rect = new Rect(
                 obj.left,
                 obj.top,
@@ -862,9 +866,7 @@ function handleLoaderClick(e) {
                 obj.height,
                 obj
             );
-            if (obj.group > -1 || -7 > obj.group) {
-                obj.group = -1;
-            }
+
             WORLD.objects.push(rect);
 
         }

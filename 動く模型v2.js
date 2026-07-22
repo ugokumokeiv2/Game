@@ -879,12 +879,6 @@ function handleLoaderClick(e) {
 
             WORLD.joints.push(joint);
         }
-    
-        data.objects.forEach(obj => {
-            if(!GROUP_FILTER[obj.group]){
-                obj.group = -1;
-            }
-        });
     }catch(e){
         alert("入力ミスがあります");
         console.error(e);

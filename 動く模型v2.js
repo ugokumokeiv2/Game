@@ -32,12 +32,12 @@ const DOM = {
 
         jointDelete: document.querySelector('#jointDel'),
 
-        loader: document.querySelector('#load')
+        loader: document.querySelector('#loaderBtn')
     },
 
     menus: {
         name: document.querySelector('.name'),
-        selectMenu: document.querySelector('#selectMenu'),
+        rectSelectMenu: document.querySelector('#rectSelectMenu'),
         groupBtns: document.querySelectorAll('.groupBtn')
     },
 
@@ -130,11 +130,8 @@ const STATE = {
         startY: null,
         endX: null,
         endY: null,
-        mouseX: null,
-        mouseY: null,
         grabBody: null,
         mouseJoint: null,
-        pointerId: null
     },
 };
 
@@ -157,8 +154,6 @@ const groupFilter = {
     [-6]: 0x0020,
     [-7]: 0x0040
 };
-
-const groups = Object.keys(groupColors).map(Number)
 
 const WORLD = {
     objects: [],
@@ -184,8 +179,6 @@ class Rect {
         this.z = Date.now();
         this.group = -1;
         this.physicsGroup = 1;
-        this.selected = false;
-        this.selectedJoint = false;
         if (data) {
             Object.assign(this, data);
         }
@@ -240,7 +233,7 @@ class RunObject {
             }
         );
 
-        WORLD.bodyMap[this.rectId] = this.body;
+        WORLD.bodyMap[rect.id] = this.body;
     }
 }
 
@@ -255,7 +248,6 @@ class Joint {
         this.x = x;
         this.y = y;
         this.options = options;
-        this.selected = false;
         if (data) {
             Object.assign(this, data);
         }
@@ -337,8 +329,6 @@ class PhysicsWorld {
         this.world = planck.World({
             gravity: planck.Vec2(0, 10)
         });
-        this.bodies = [];
-        this.constraints = [];
     }
 }
 
@@ -557,10 +547,6 @@ function drawRunObjects() {
 }
 
 function makeJoint() {
-    for (let i = 0; i < WORLD.objects.length; i++) {
-        WORLD.objects[i].selectedJoint = false;
-    }
-
     STATE.selectedRectOfJoint = [];
 
     for (let i = WORLD.objects.length - 1; i >= 0; i--) {
@@ -573,7 +559,6 @@ function makeJoint() {
             STATE.mouse.cellY < rect.top + rect.height
         ) {
             STATE.selectedRectOfJoint.push(rect);
-            rect.selectedJoint = true;
         }
     }
 
@@ -643,11 +628,6 @@ function editMode(e) {
             WORLD.joints[i].selected = false;
         }
 
-        for (let i = 0; i < WORLD.objects.length; i++) {
-            WORLD.objects[i].selected = false;
-        }
-
-        STATE.selectedRect = null;
         STATE.selectedJoint = null;
 
         for (let i = WORLD.joints.length - 1; i >= 0; i--) {
@@ -665,7 +645,7 @@ function editMode(e) {
         }
 
         if (STATE.selectedJoint) {
-            DOM.menus.selectMenu.style.display = "none";
+            DOM.menus.rectSelectMenu.style.display = "none";
             DOM.jointMenus.jointSelectMenu.style.display = "flex";
             DOM.jointMenus.jointSelectMenu.style.left = e.pageX + "px";
             DOM.jointMenus.jointSelectMenu.style.top = e.pageY + "px";
@@ -682,20 +662,19 @@ function editMode(e) {
                 STATE.mouse.cellY < rect.top + rect.height
             ) {
                 STATE.selectedRect = rect;
-                rect.selected = true;
 
-                DOM.menus.selectMenu.style.display = "flex";
-                DOM.menus.selectMenu.style.left = e.pageX + "px";
-                DOM.menus.selectMenu.style.top = e.pageY + "px";
+                DOM.menus.rectSelectMenu.style.display = "flex";
+                DOM.menus.rectSelectMenu.style.left = e.pageX + "px";
+                DOM.menus.rectSelectMenu.style.top = e.pageY + "px";
                 DOM.menus.name.value = rect.name;
                 break;
             } else {
-                DOM.menus.selectMenu.style.display = "none";
+                DOM.menus.rectSelectMenu.style.display = "none";
             }
         }
     } else if (STATE.tool === "joint") {
         makeJoint();
-        DOM.menus.selectMenu.style.display = "none";
+        DOM.menus.rectSelectMenu.style.display = "none";
     }
 }
 
@@ -835,14 +814,14 @@ function handleCreateClick() {
 
 function handleSelectClick() {
     if (STATE.mode === "edit") {
-        DOM.menus.selectMenu.style.display = "none";
+        DOM.menus.rectSelectMenu.style.display = "none";
         STATE.tool = "select";
     }
 }
 
 function handleFixClick() {
     if (STATE.mode === "edit") {
-        DOM.menus.selectMenu.style.display = "none";
+        DOM.menus.rectSelectMenu.style.display = "none";
         STATE.tool = "joint";
         STATE.rawtype = "fix";
     }
@@ -850,7 +829,7 @@ function handleFixClick() {
 
 function handleHingeClick() {
     if (STATE.mode === "edit") {
-        DOM.menus.selectMenu.style.display = "none";
+        DOM.menus.rectSelectMenu.style.display = "none";
         STATE.tool = "joint";
         STATE.rawtype = "hinge";
     }
@@ -858,7 +837,7 @@ function handleHingeClick() {
 
 function handleMotorClick() {
     if (STATE.mode === "edit") {
-        DOM.menus.selectMenu.style.display = "none";
+        DOM.menus.rectSelectMenu.style.display = "none";
         STATE.tool = "joint";
         STATE.rawtype = "motor";
     }
@@ -875,7 +854,7 @@ function handleDeleteOfAllClick() {
 
 function handleDeleteClick() {
     if (STATE.mode === "edit") {
-        DOM.menus.selectMenu.style.display = "none";
+        DOM.menus.rectSelectMenu.style.display = "none";
         for (let i = WORLD.joints.length - 1; i >= 0; i--) {
             const joint = WORLD.joints[i];
             if (joint.aId === STATE.selectedRect.id || joint.bId === STATE.selectedRect.id) {
@@ -932,13 +911,13 @@ function updateUI() {
         DOM.run.style.display = "none";
         DOM.saveload.style.display = "none";
     } else if (STATE.mode === "run") {
-        DOM.menus.selectMenu.style.display = "none";
+        DOM.menus.rectSelectMenu.style.display = "none";
         DOM.jointMenus.jointSelectMenu.style.display = "none";
         DOM.editor.style.display = "none";
         DOM.run.style.display = "flex";
         DOM.saveload.style.display = "none";
     } else if (STATE.mode === "load") {
-        DOM.menus.selectMenu.style.display = "none";
+        DOM.menus.rectSelectMenu.style.display = "none";
         DOM.jointMenus.jointSelectMenu.style.display = "none";
         DOM.editor.style.display = "none";
         DOM.run.style.display = "none";
@@ -1052,7 +1031,7 @@ DOM.menus.groupBtns.forEach(btn => {
         if (!STATE.selectedRect) return;
 
         STATE.selectedRect.group = Number(btn.dataset.group);
-        DOM.menus.selectMenu.style.display = "none";
+        DOM.menus.rectSelectMenu.style.display = "none";
     });
 });
 

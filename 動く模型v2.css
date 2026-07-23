@@ -74,7 +74,7 @@ body {
 
 /* ---------- menu ---------- */
 
-#selectMenu,
+#rectSelectMenu,
 #jointSelectMenu {
     position: absolute;
 
@@ -164,10 +164,6 @@ body {
     border-radius: 6px;
 }
 
-.sliderBox p {
-    margin: 0;
-}
-
 .sliderLine {
     display: flex;
     align-items: center;
@@ -220,11 +216,6 @@ button {
 
 /* ---------- icons ---------- */
 
-#startBtn,
-#stopBtn {
-    position: relative;
-}
-
 .jointIcon {
     display: inline-block;
 
@@ -275,7 +266,7 @@ button {
 }
 
 
-.startBtn::before {
+.startIcon::before {
     content:"";
 
     position:absolute;
@@ -292,8 +283,8 @@ button {
 }
 
 
-.stopBtn::before,
-.stopBtn::after {
+.stopIcon::before,
+.stopIcon::after {
     content:"";
 
     position:absolute;
@@ -306,11 +297,11 @@ button {
     background:white;
 }
 
-.stopBtn::before {
+.stopIcon::before {
     left:11px;
 }
 
-.stopBtn::after {
+.stopIcon::after {
     left:23px;
 }
 
@@ -381,7 +372,7 @@ button {
     }
 
 
-    #load {
+    #loaderBtn {
         display:flex;
         flex-direction:column;
     }

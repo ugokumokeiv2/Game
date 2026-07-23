@@ -8,6 +8,7 @@
 html,
 body {
     height: 100%;
+    width: 100%;
     margin: 0;
 
     display: flex;
@@ -37,7 +38,7 @@ body {
 }
 
 #saveload {
-    width: 100%;
+    width: auto;
     height: auto;
 
     display: flex;
@@ -48,6 +49,10 @@ body {
     border-radius: 15px;
 
     overflow: hidden;
+}
+
+#loadTool {
+    flex: 0 0 120px;
 }
 
 
@@ -142,19 +147,12 @@ body {
 
     font-size: 10px;
     color: var(--text);
-
     gap: 2px;
-}
-
-#sliders p {
-    margin: 0;
 }
 
 .sliderBox {
     display: flex;
     flex-direction: column;
-
-    gap: 4px;
 
     margin-bottom: 8px;
 
@@ -352,7 +350,7 @@ button {
 
 
     #editScene,
-    #runScene {
+    #runScene{
         order:1;
     }
 
@@ -363,13 +361,26 @@ button {
         width:100%;
         max-width:100%;
 
-        display:block;
+        display:flex;
+        flex-direction:row;
+        align-items:stretch;
+    }
+
+    #loadTool {
+        display:flex;
+        flex-direction:column;
+        width:max-content;
+        flex:0 0 auto;
+        order:1;
     }
 
 
     #saveData {
-        width:100% !important;
-        max-width:100% !important;
+        width:auto !important;
+        max-width:none !important;
+        flex:1;
+        min-width:0;
+        order:2;
 
         min-height:300px !important;
         height:60vh !important;
@@ -377,7 +388,7 @@ button {
 
 
     #loaderBtn {
-        display:flex;
-        flex-direction:column;
+        width:max-content;
+        height:max-content;
     }
 }

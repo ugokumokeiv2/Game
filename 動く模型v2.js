@@ -47,7 +47,11 @@ const DOM = {
         jointTypeChangers: document.querySelectorAll('.jointTypeChanger'),
         sliders: {
             speedSlider: document.querySelector('#speedSlider'),
-            torqueSlider: document.querySelector('#torqueSlider')
+            torqueSlider: document.querySelector('#torqueSlider'),
+            values: {
+                speedValue: document.querySelector('#speedValue'),
+                torqueValue: document.querySelector('#torqueValue')
+            }
         }
     },
 
@@ -104,6 +108,9 @@ DOM.jointMenus.sliders.speedSlider.value = CONFIG.motor.speed.default;
 DOM.jointMenus.sliders.torqueSlider.min = CONFIG.motor.torque.min;
 DOM.jointMenus.sliders.torqueSlider.max = CONFIG.motor.torque.max;
 DOM.jointMenus.sliders.torqueSlider.value = CONFIG.motor.torque.default;
+
+DOM.jointMenus.sliders.values.speedValue.textContent =DOM.jointMenus.sliders.speedSlider.value;
+DOM.jointMenus.sliders.values.torqueValue.textContent =DOM.jointMenus.sliders.torqueSlider.value;
 
 const STATE = {
     mode: "edit",
@@ -1060,11 +1067,13 @@ DOM.jointMenus.jointTypeChangers.forEach(btn => {
 
 DOM.jointMenus.sliders.speedSlider.addEventListener("input", e => {
     const settingSpeed = Number(e.target.value);
+    DOM.jointMenus.sliders.values.speedValue.textContent = settingSpeed;
     changeJointSpeed(STATE.selectedJoint, settingSpeed);
 });
 
 DOM.jointMenus.sliders.torqueSlider.addEventListener("input", e => {
     const settingTorque = Number(e.target.value);
+    DOM.jointMenus.sliders.values.torqueValue.textContent = settingTorque;
     changeJointTorque(STATE.selectedJoint, settingTorque);
 });
 

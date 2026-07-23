@@ -85,8 +85,21 @@
 			<input type="text" class="jointName"></input>
 		</div>
 		<div id="sliders">
-			<input id="speedSlider" type="range">
-			<input id="torqueSlider" type="range">
+			<div class="sliderBox">
+				<p>回転速度(rad/s)</p>
+				<div class="sliderLine">
+					<input id="speedSlider" type="range">
+					<span id="speedValue"></span>
+				</div>
+			</div>
+
+			<div class="sliderBox">
+				<p>回す力(Nm)</p>
+				<div class="sliderLine">
+					<input id="torqueSlider" type="range">
+					<span id="torqueValue"></span>
+				</div>
+			</div>
 		</div>
 		<div class="typeRow">
 			<button class="jointTypeChanger" data-joint="fix">

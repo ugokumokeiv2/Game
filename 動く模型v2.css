@@ -1,100 +1,93 @@
+:root {
+    --bg-main: #333;
+    --bg-panel: #222;
+    --bg-tool: #444;
+    --text: #ddd;
+}
+
 html,
-body{
-    height:100%;
-    margin:0;
-    display:flex;
+body {
+    height: 100%;
+    margin: 0;
+
+    display: flex;
     flex-direction: column;
-    align-items:center;
-    justify-content:center;
-    font-family:sans-serif;
-    background:#333;
+    align-items: center;
+    justify-content: center;
+
+    font-family: sans-serif;
+    background: var(--bg-main);
 }
 
 * {
-    box-sizing:border-box;
+    box-sizing: border-box;
 }
 
-#editor {
-    display:flex;
-    flex-direction: row; 
-}
 
-#editorTool {
-    display:flex;
-    flex-direction: column;
-    gap:8px;
+/* ---------- layout ---------- */
 
-    padding:10px;
-    margin-right:10px;
-
-    background:#444;
-    border-radius:10px;
-}
-
+#editor,
 #run {
-    display:flex;
-    flex-direction: row; 
-}
-
-#runTool {
-    display:flex;
-    flex-direction: column;
-    gap:8px;
-
-    padding:10px;
-    margin-right:10px;
-
-    background:#444;
-    border-radius:10px;
-}
-
-#load {
-    display:flex;
-    flex-direction: row;
-}
-
-#loadTool {
     display: flex;
-    flex-direction: column;
-    gap:8px;
+    flex-direction: row;
 
-    padding:10px;
-    margin-right:10px;
-
-    background:#444;
-    border-radius:10px;
-}
-
-#selectMenu {
-    position: absolute;
-    display: none;
-    flex-direction: column;
-
-    background: rgb(54, 51, 51);
-    border: 1px solid black;
-    padding: 8px;
-    gap: 8px;
-}
-
-#jointSelectMenu {
-    position: absolute;
-    display: none;
-    flex-direction: column;
-
-    background: rgb(54, 51, 51);
-    border: 1px solid black;
-    padding: 8px;
-    gap: 8px;
+    background: var(--bg-panel);
+    padding: 15px;
+    border-radius: 15px;
 }
 
 #saveload {
-    background: #333;
     width: 100%;
     height: auto;
-    box-sizing: border-box;
-    overflow: hidden;
+
+    display: flex;
     flex-direction: row;
+
+    background: var(--bg-panel);
+    padding: 15px;
+    border-radius: 15px;
+
+    overflow: hidden;
 }
+
+
+/* ---------- tool panel ---------- */
+
+.toolPanel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    padding: 10px;
+    margin-right: 10px;
+
+    background: var(--bg-tool);
+    border-radius: 10px;
+}
+
+#editorTool button {
+    width: 100%;
+}
+
+
+/* ---------- menu ---------- */
+
+#selectMenu,
+#jointSelectMenu {
+    position: absolute;
+
+    display: none;
+    flex-direction: column;
+
+    background: rgb(54,51,51);
+    border: 1px solid black;
+
+    padding: 8px;
+    gap: 8px;
+}
+
+
+/* ---------- group ---------- */
 
 .groupRow {
     display: flex;
@@ -104,9 +97,10 @@ body{
 .groupBtn {
     width: 24px;
     height: 24px;
+
     border: 1px solid black;
-    display:flex;
-    flex-direction: row;
+
+    display: flex;
 }
 
 .groupBtn:nth-child(1) {
@@ -137,32 +131,78 @@ body{
     background: cyan;
 }
 
-#sliders {
-    display: flex;
-    flex-direction: column;
+
+/* ---------- slider ---------- */
+
+.sliderBox {
+    display:flex;
+    flex-direction:column;
+
+    gap:4px;
+
+    margin-bottom:8px;
+
+    padding:6px;
+
+    background:#333;
+    border-radius:6px;
 }
+
+.sliderBox p {
+    margin:0;
+}
+
+.sliderLine {
+    display:flex;
+    align-items:center;
+
+    gap:8px;
+}
+
+.sliderLine input {
+    flex:1;
+}
+
+.sliderLine span {
+    width:40px;
+    text-align:right;
+}
+
+
+/* ---------- canvas ---------- */
 
 canvas {
     width: min(100%,800px);
     height: auto;
+
     touch-action: none;
 }
+
+
+/* ---------- save ---------- */
 
 #saveData {
     width: 800px;
     height: 600px;
-    box-sizing:border-box;
-    flex:1;
+
     resize: none;
+
     font-family: monospace;
+
     background: black;
-    color:greenyellow;
+    color: greenyellow;
 }
 
+
+/* ---------- button ---------- */
+
 button {
-    background: #444;
+    background: var(--bg-tool);
     color: white;
 }
+
+
+/* ---------- icons ---------- */
 
 #startBtn,
 #stopBtn {
@@ -170,30 +210,40 @@ button {
 }
 
 .jointIcon {
-    display:inline-block;
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    background:transparent;
-    border:2px solid;
-    margin-right:6px;
+    display: inline-block;
+
+    width: 10px;
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: transparent;
+
+    border: 2px solid;
+
+    margin-right: 6px;
 }
 
 .runIcon {
     width: 40px;
     height: 40px;
+
     border: none;
     background: transparent;
+
     position: relative;
 }
 
 .objectIcon {
-    display:inline-block;
-    width:10px;
-    height:8px;
-    margin-right:6px;
-    background:rgba(0,120,255,0.4);
-    border:2px solid rgb(0,120,255);
+    display: inline-block;
+
+    width: 10px;
+    height: 8px;
+
+    margin-right: 6px;
+
+    background: rgba(0,120,255,0.4);
+    border: 2px solid rgb(0,120,255);
 }
 
 .fixIcon {
@@ -208,104 +258,106 @@ button {
     border-color:green;
 }
 
+
 .startBtn::before {
-    content: "";
-    position: absolute;
-    top: 8px;
-    left: 13px;
-    width: 0;
-    height: 0;
-    border-top: 12px solid transparent;
-    border-bottom: 12px solid transparent;
-    border-left: 20px solid white;
+    content:"";
+
+    position:absolute;
+
+    top:8px;
+    left:13px;
+
+    width:0;
+    height:0;
+
+    border-top:12px solid transparent;
+    border-bottom:12px solid transparent;
+    border-left:20px solid white;
 }
+
 
 .stopBtn::before,
 .stopBtn::after {
-    content: "";
-    position: absolute;
-    top: 10px;
-    width: 6px;
-    height: 20px;
-    background: white;
+    content:"";
+
+    position:absolute;
+
+    top:10px;
+
+    width:6px;
+    height:20px;
+
+    background:white;
 }
 
 .stopBtn::before {
-    left: 11px;
+    left:11px;
 }
 
 .stopBtn::after {
-    left: 23px;
+    left:23px;
 }
 
-#editor,
-#run,
-#saveload {
-    background:#222;
-    padding:15px;
-    border-radius:15px;
-}
 
-#editorTool button {
-    width:100%;
-}
+/* ---------- credit ---------- */
 
 #credit {
-    color:#ddd;
+    color:var(--text);
 }
 
+
+/* ---------- mobile ---------- */
+
 @media (max-width:600px) {
-    html,body{
+
+    html,
+    body {
         justify-content:flex-start;
     }
 
-    #saveload{
-        margin-top:10px;
-        width: 100%;
-        max-width: 100%;
-        height: auto;
-        display: block;
-    }
 
-    #editor {
-        flex-direction:column;
-    }
-
-    #editorTool {
-        order:2;
-        margin-right:0;
-        margin-top:10px;
-        display:grid !important;
-        grid-template-columns:repeat(3, 1fr);
-    }
-
-    #editScene {
-        order:1;
-    }
-
-
-    #saveData {
-        width: 100% !important;
-        max-width: 100% !important;
-        min-height: 300px !important;
-        height: 60vh !important;
-    }
-
+    #editor,
     #run {
         flex-direction:column;
     }
 
+
+    #editorTool,
     #runTool {
         order:2;
+
         margin-right:0;
         margin-top:10px;
+
         display:grid;
-        grid-template-columns:repeat(3, 1fr);
+        grid-template-columns:repeat(3,1fr);
     }
 
+
+    #editScene,
     #runScene {
         order:1;
     }
+
+
+    #saveload {
+        margin-top:10px;
+
+        width:100%;
+        max-width:100%;
+
+        display:block;
+    }
+
+
+    #saveData {
+        width:100% !important;
+        max-width:100% !important;
+
+        min-height:300px !important;
+        height:60vh !important;
+    }
+
 
     #load {
         display:flex;

@@ -265,7 +265,10 @@ class RunJoint {
             const revolute = planck.RevoluteJoint(
                 {
                     enableLimit: false,
-                    enableMotor: false
+                    enableMotor: false,
+                    referenceAngle: this.options.relativeAngle,
+                    motorSpeed: this.options.speed,
+                    maxMotorTorque: this.options.maxTorque
                 },
                 this.bodyA,
                 this.bodyB,
@@ -275,9 +278,11 @@ class RunJoint {
         } else if (this.type === "fix") {
             const weld = planck.WeldJoint(
                 {
-                    referenceAngle: this.options.relativeAngle,
                     enableLimit: false,
-                    enableMotor: false
+                    enableMotor: false,
+                    referenceAngle: this.options.relativeAngle,
+                    motorSpeed: this.options.speed,
+                    maxMotorTorque: this.options.maxTorque
                 },
                 this.bodyA,
                 this.bodyB,
@@ -289,6 +294,7 @@ class RunJoint {
                 {
                     enableLimit: false,
                     enableMotor: true,
+                    referenceAngle: this.options.relativeAngle,
                     motorSpeed: this.options.speed,
                     maxMotorTorque: this.options.maxTorque
                 },
@@ -559,14 +565,20 @@ function makeJoint() {
         if ( STATE.rawtype === "fix" ) {
             type = "fix";
             options = { 
-                relativeAngle: rectB.angle - rectA.angle
+                relativeAngle: rectB.angle - rectA.angle,
+                speed: -3,
+                maxTorque: 100
             };
         } else if ( STATE.rawtype === "hinge" ) { 
             type = "hinge";
-            options = {};
+            options = {
+                relativeAngle: rectB.angle - rectA.angle,
+                speed: -3,
+                maxTorque: 100};
         } else if ( STATE.rawtype === "motor" ) {
             type = "motor";
             options = { 
+                relativeAngle: rectB.angle - rectA.angle,
                 speed: -3,
                 maxTorque: 100
             };
@@ -586,28 +598,9 @@ function makeJoint() {
     }
 }
 
-function changeJointType(joint,newType){
+function changeJointType(joint,newType,oldOptions){
     joint.type = newType;
-
-    if(newType === "hinge"){
-        joint.options = {};
-    }
-
-    if(newType === "fix"){
-        const a = WORLD.objects.find(o=>o.id===joint.aId);
-        const b = WORLD.objects.find(o=>o.id===joint.bId);
-
-        joint.options = {
-            relativeAngle:b.angle-a.angle
-        };
-    }
-
-    if(newType === "motor"){
-        joint.options = {
-            speed:-3,
-            maxTorque:100
-        };
-    }
+    joint.options = oldOptions;
 }
 
 function editMode(e) {
@@ -1031,8 +1024,9 @@ DOM.menus.groupBtns.forEach(btn => {
 
 DOM.jointMenus.jointTypeChangers.forEach(btn=>{
     btn.addEventListener("click",()=>{
+        const oldOptions = STATE.selectedJoint.options;
         const type = btn.dataset.joint;
-        changeJointType(STATE.selectedJoint,type);
+        changeJointType(STATE.selectedJoint,type,oldOptions);
         DOM.jointMenus.jointSelectMenu.style.display="none";
     });
 });

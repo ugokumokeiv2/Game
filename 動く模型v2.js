@@ -7,7 +7,7 @@ const DOM = {
     run: document.querySelector('#run'),
     saveload: document.querySelector('#saveload'),
 
-    ctx:{
+    ctx: {
         editCtx: document.querySelector('#editScene').getContext('2d'),
         runCtx: document.querySelector('#runScene').getContext('2d')
     },
@@ -53,7 +53,7 @@ const DOM = {
 }
 
 const CONFIG = {
-    cell : 20,
+    cell: 20,
     repaircell: 6,
     SCALE: 50,
     xoffset: 150,
@@ -68,10 +68,6 @@ const CONFIG = {
         width: 800,
         height: 600
     },
-
-    world: {
-        motorPower: 0.01
-    }
 };
 
 DOM.editScene.width = CONFIG.editorSize.width;
@@ -93,10 +89,6 @@ const STATE = {
     selectedJoint: null,
     selectedRectOfJoint: [],
 
-    world: {
-        motorPower: CONFIG.world.motorPower
-    },
-
     mouse: {
         isDown: false,
         cellX: null,
@@ -107,9 +99,9 @@ const STATE = {
         endY: null,
         mouseX: null,
         mouseY: null,
-        grabBody:null,
-        mouseJoint:null,
-        pointerId:null
+        grabBody: null,
+        mouseJoint: null,
+        pointerId: null
     }
 };
 
@@ -161,7 +153,7 @@ class Rect {
         this.physicsGroup = 1;
         this.selected = false;
         this.selectedJoint = false;
-        if(data) {
+        if (data) {
             Object.assign(this, data);
         }
         this.centerX = this.left + this.width / 2;
@@ -193,9 +185,9 @@ class RunObject {
         this.height = rect.height * CONFIG.repaircell;
 
         const point = editToWorld(rect.centerX, rect.centerY);
-        
+
         this.body = physics.world.createBody({
-            type:"dynamic",
+            type: "dynamic",
             position: planck.Vec2(point.x / CONFIG.SCALE, point.y / CONFIG.SCALE)
         });
 
@@ -207,8 +199,8 @@ class RunObject {
                 this.height / 2 / CONFIG.SCALE
             ),
             {
-                friction:1,
-                density:5,
+                friction: 1,
+                density: 5,
 
                 filterCategoryBits: filter,
                 filterMaskBits: 0xffff ^ filter
@@ -231,26 +223,26 @@ class Joint {
         this.y = y;
         this.options = options;
         this.selected = false;
-        if(data) {
+        if (data) {
             Object.assign(this, data);
         }
     }
-    toJSON(){
+    toJSON() {
         return {
-            id:this.id,
-            name:this.name,
-            type:this.type,
-            aId:this.aId,
-            bId:this.bId,
-            x:this.x,
-            y:this.y,
-            options:this.options
+            id: this.id,
+            name: this.name,
+            type: this.type,
+            aId: this.aId,
+            bId: this.bId,
+            x: this.x,
+            y: this.y,
+            options: this.options
         };
     }
 }
 
 class RunJoint {
-    constructor(joint){
+    constructor(joint) {
         this.jointId = joint.id;
         this.name = joint.name;
         this.type = joint.type;
@@ -260,7 +252,7 @@ class RunJoint {
 
         const point = editToWorld(joint.x, joint.y);
         const anchor = planck.Vec2(point.x / CONFIG.SCALE, point.y / CONFIG.SCALE);
-        
+
         if (this.type === "hinge") {
             const revolute = planck.RevoluteJoint(
                 {
@@ -319,7 +311,7 @@ class PhysicsWorld {
 
 const physics = new PhysicsWorld();
 
-function getPointerPos(e, canvas){
+function getPointerPos(e, canvas) {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
@@ -337,7 +329,7 @@ function editToWorld(x, y) {
     };
 }
 
-function makeBlock(){
+function makeBlock() {
     let left = Math.min(STATE.mouse.startX, STATE.mouse.endX);
     let right = Math.max(STATE.mouse.startX, STATE.mouse.endX);
 
@@ -346,7 +338,7 @@ function makeBlock(){
 
     let width = right - left + 1;
     let height = bottom - top + 1;
-    return {left, top, width, height};
+    return { left, top, width, height };
 }
 
 function createFloor() {
@@ -361,8 +353,8 @@ function createFloor() {
             friction: 1.5,
             restitution: 0.01,
 
-            filterCategoryBits:0x0080,
-            filterMaskBits:0xffff
+            filterCategoryBits: 0x0080,
+            filterMaskBits: 0xffff
         }
     );
 
@@ -377,8 +369,8 @@ function createFloor() {
             friction: 1.5,
             restitution: 0.01,
 
-            filterCategoryBits:0x0080,
-            filterMaskBits:0xffff
+            filterCategoryBits: 0x0080,
+            filterMaskBits: 0xffff
         }
     );
 
@@ -393,8 +385,8 @@ function createFloor() {
             friction: 1.5,
             restitution: 0.01,
 
-            filterCategoryBits:0x0080,
-            filterMaskBits:0xffff
+            filterCategoryBits: 0x0080,
+            filterMaskBits: 0xffff
         }
     );
 
@@ -409,8 +401,8 @@ function createFloor() {
             friction: 1.5,
             restitution: 0.01,
 
-            filterCategoryBits:0x0080,
-            filterMaskBits:0xffff
+            filterCategoryBits: 0x0080,
+            filterMaskBits: 0xffff
         }
     );
 
@@ -424,15 +416,15 @@ function createFloor() {
         {
             friction: 1.5,
             restitution: 0.01,
-            filterCategoryBits:0x0080,
-            filterMaskBits:0xffff
+            filterCategoryBits: 0x0080,
+            filterMaskBits: 0xffff
         }
     );
 }
 
 function resetWorld() {
     physics.world = planck.World({
-        gravity: planck.Vec2(0,10)
+        gravity: planck.Vec2(0, 10)
     });
 
     WORLD.mouseBody = physics.world.createBody();
@@ -467,7 +459,7 @@ function drawGrid() {
 }
 
 function drawRects() {
-    const sorted = [ ...WORLD.objects ].sort((a, b) => a.z - b.z);
+    const sorted = [...WORLD.objects].sort((a, b) => a.z - b.z);
     for (let i = 0; i < sorted.length; i++) {
         const rect = sorted[i];
         const base = groupColors[rect.group];
@@ -483,12 +475,12 @@ function drawRects() {
 
 function drawJoints() {
     DOM.ctx.editCtx.lineWidth = 2;
-    for (let i = 0; i < WORLD.joints.length; i++){
-        if ( WORLD.joints[i].type === "fix") {
+    for (let i = 0; i < WORLD.joints.length; i++) {
+        if (WORLD.joints[i].type === "fix") {
             DOM.ctx.editCtx.strokeStyle = 'red';
         } else if (WORLD.joints[i].type === "hinge") {
             DOM.ctx.editCtx.strokeStyle = 'blue';
-        } else if (WORLD.joints[i].type === "motor" ) {
+        } else if (WORLD.joints[i].type === "motor") {
             DOM.ctx.editCtx.strokeStyle = 'green';
         }
         DOM.ctx.editCtx.beginPath();
@@ -520,7 +512,7 @@ function drawRunObjects() {
         const first = body.getWorldPoint(vertices[0]);
         DOM.ctx.runCtx.moveTo(first.x * CONFIG.SCALE, first.y * CONFIG.SCALE);
 
-        for(let j = 1; j < vertices.length; j++) {
+        for (let j = 1; j < vertices.length; j++) {
             const p = body.getWorldPoint(vertices[j]);
             DOM.ctx.runCtx.lineTo(p.x * CONFIG.SCALE, p.y * CONFIG.SCALE);
         }
@@ -551,9 +543,9 @@ function makeJoint() {
             rect.selectedJoint = true;
         }
     }
-    
+
     STATE.selectedRectOfJoint.sort((a, b) => a.z - b.z);
-    
+
     let rectA = null;
     let rectB = null;
     let type = null;
@@ -562,22 +554,23 @@ function makeJoint() {
     if (STATE.selectedRectOfJoint.length >= 2) {
         rectA = STATE.selectedRectOfJoint[0];
         rectB = STATE.selectedRectOfJoint[1];
-        if ( STATE.rawtype === "fix" ) {
+        if (STATE.rawtype === "fix") {
             type = "fix";
-            options = { 
+            options = {
                 relativeAngle: rectB.angle - rectA.angle,
                 speed: -3,
                 maxTorque: 100
             };
-        } else if ( STATE.rawtype === "hinge" ) { 
+        } else if (STATE.rawtype === "hinge") {
             type = "hinge";
             options = {
                 relativeAngle: rectB.angle - rectA.angle,
                 speed: -3,
-                maxTorque: 100};
-        } else if ( STATE.rawtype === "motor" ) {
+                maxTorque: 100
+            };
+        } else if (STATE.rawtype === "motor") {
             type = "motor";
-            options = { 
+            options = {
                 relativeAngle: rectB.angle - rectA.angle,
                 speed: -3,
                 maxTorque: 100
@@ -598,7 +591,7 @@ function makeJoint() {
     }
 }
 
-function changeJointType(joint,newType,oldOptions){
+function changeJointType(joint, newType, oldOptions) {
     joint.type = newType;
     joint.options = oldOptions;
 }
@@ -642,9 +635,9 @@ function editMode(e) {
         for (let i = WORLD.objects.length - 1; i >= 0; i--) {
             const rect = WORLD.objects[i];
             if (
-                STATE.mouse.cellX >= rect.left && 
-                STATE.mouse.cellX < rect.left + rect.width && 
-                STATE.mouse.cellY >= rect.top && 
+                STATE.mouse.cellX >= rect.left &&
+                STATE.mouse.cellX < rect.left + rect.width &&
+                STATE.mouse.cellY >= rect.top &&
                 STATE.mouse.cellY < rect.top + rect.height
             ) {
                 STATE.selectedRect = rect;
@@ -883,7 +876,7 @@ function handleStopClick() {
     }
 }
 
-function handleResetClick(){
+function handleResetClick() {
     if (STATE.mode === "run") {
         STATE.modeInRun = "pause";
         resetWorld();
@@ -923,13 +916,13 @@ function handleLoadClick() {
 }
 
 function handleLoaderClick(e) {
-    try{
+    try {
         const data = JSON.parse(DOM.load.textbox.value);
 
         WORLD.objects.length = 0;
         WORLD.joints.length = 0;
 
-        for(let i = 0; i < data.objects.length; i++){
+        for (let i = 0; i < data.objects.length; i++) {
             const obj = data.objects[i];
             if (typeof obj.group !== "number" || obj.group > -1 || obj.group < -7) {
                 alert("error: groupを-1に書き換えました")
@@ -947,7 +940,7 @@ function handleLoaderClick(e) {
 
         }
 
-        for(let j = 0; j < data.joints.length; j++){
+        for (let j = 0; j < data.joints.length; j++) {
             const joi = data.joints[j];
             const joint = new Joint(
                 joi.type,
@@ -961,12 +954,12 @@ function handleLoaderClick(e) {
 
             WORLD.joints.push(joint);
         }
-    }catch(e){
+    } catch (e) {
         alert("入力ミスがあります");
     }
 }
 
-function saveData(){
+function saveData() {
     const data = {
         objects: WORLD.objects,
         joints: WORLD.joints
@@ -998,17 +991,17 @@ DOM.buttons.edit.addEventListener("click", () => setMode("edit"));
 DOM.buttons.load.addEventListener("click", () => setMode("load"));
 
 DOM.buttons.start.addEventListener("click", handleStartClick);
-DOM.buttons.stop.addEventListener("click",handleStopClick);
-DOM.buttons.reset.addEventListener("click",handleResetClick);
+DOM.buttons.stop.addEventListener("click", handleStopClick);
+DOM.buttons.reset.addEventListener("click", handleResetClick);
 
-DOM.menus.name.addEventListener("input", e=>{
-    if(STATE.selectedRect){
+DOM.menus.name.addEventListener("input", e => {
+    if (STATE.selectedRect) {
         STATE.selectedRect.name = e.target.value;
     }
 });
 
-DOM.jointMenus.jointName.addEventListener("input", e=>{
-    if(STATE.selectedJoint){
+DOM.jointMenus.jointName.addEventListener("input", e => {
+    if (STATE.selectedJoint) {
         STATE.selectedJoint.name = e.target.value;
     }
 });
@@ -1022,28 +1015,28 @@ DOM.menus.groupBtns.forEach(btn => {
     });
 });
 
-DOM.jointMenus.jointTypeChangers.forEach(btn=>{
-    btn.addEventListener("click",()=>{
+DOM.jointMenus.jointTypeChangers.forEach(btn => {
+    btn.addEventListener("click", () => {
         const oldOptions = STATE.selectedJoint.options;
         const type = btn.dataset.joint;
-        changeJointType(STATE.selectedJoint,type,oldOptions);
-        DOM.jointMenus.jointSelectMenu.style.display="none";
+        changeJointType(STATE.selectedJoint, type, oldOptions);
+        DOM.jointMenus.jointSelectMenu.style.display = "none";
     });
 });
 
 DOM.buttons.delete.addEventListener("click", handleDeleteClick);
 DOM.buttons.jointDelete.addEventListener("click", handleJointDeleteClick);
 
-DOM.buttons.load.addEventListener("click",handleLoadClick);
-DOM.buttons.loader.addEventListener("click",handleLoaderClick);
+DOM.buttons.load.addEventListener("click", handleLoadClick);
+DOM.buttons.loader.addEventListener("click", handleLoaderClick);
 
 function loop() {
-    if(STATE.mode === "edit") {
+    if (STATE.mode === "edit") {
         DOM.ctx.editCtx.clearRect(0, 0, DOM.editScene.width, DOM.editScene.height);
         drawRects();
         drawJoints();
         drawGrid();
-    } else if(STATE.mode === "run") {
+    } else if (STATE.mode === "run") {
         if (STATE.modeInRun === "start") {
             physics.world.step(1 / 60);
         }
@@ -1052,7 +1045,7 @@ function loop() {
         DOM.ctx.runCtx.lineWidth = 4;
         DOM.ctx.runCtx.strokeRect(0, 0, DOM.runScene.width, DOM.runScene.height);
         DOM.ctx.runCtx.lineWidth = 1;
-        DOM.ctx.runCtx.strokeRect(150 , 500 , 500 , 120);
+        DOM.ctx.runCtx.strokeRect(150, 500, 500, 120);
         drawRunObjects();
     }
     requestAnimationFrame(loop);

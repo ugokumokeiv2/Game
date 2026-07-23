@@ -44,7 +44,11 @@ const DOM = {
     jointMenus: {
         jointName: document.querySelector('.jointName'),
         jointSelectMenu: document.querySelector('#jointSelectMenu'),
-        jointTypeChangers: document.querySelectorAll('.jointTypeChanger')
+        jointTypeChangers: document.querySelectorAll('.jointTypeChanger'),
+        sliders: {
+            speedSlider: document.querySelector('#speedSlider'),
+            torqueSlider: document.querySelector('#torqueSlider')
+        }
     },
 
     load: {
@@ -68,6 +72,20 @@ const CONFIG = {
         width: 800,
         height: 600
     },
+    
+    motor: {
+        speed: {
+            min: -10,
+            max: 10,
+            default: -3
+        },
+
+        torque: {
+            min: 0,
+            max: 500,
+            default: 100
+        }
+    }
 };
 
 DOM.editScene.width = CONFIG.editorSize.width;
@@ -78,6 +96,14 @@ DOM.runScene.height = CONFIG.runnerSize.height;
 
 CONFIG.cols = Math.floor(DOM.editScene.width / CONFIG.cell);
 CONFIG.rows = Math.floor(DOM.editScene.height / CONFIG.cell);
+
+DOM.jointMenus.sliders.speedSlider.min = CONFIG.motor.speed.min;
+DOM.jointMenus.sliders.speedSlider.max = CONFIG.motor.speed.max;
+DOM.jointMenus.sliders.speedSlider.value = CONFIG.motor.speed.default;
+
+DOM.jointMenus.sliders.torqueSlider.min = CONFIG.motor.torque.min;
+DOM.jointMenus.sliders.torqueSlider.max = CONFIG.motor.torque.max;
+DOM.jointMenus.sliders.torqueSlider.value = CONFIG.motor.torque.default;
 
 const STATE = {
     mode: "edit",
@@ -102,7 +128,7 @@ const STATE = {
         grabBody: null,
         mouseJoint: null,
         pointerId: null
-    }
+    },
 };
 
 const groupColors = {
@@ -596,6 +622,14 @@ function changeJointType(joint, newType, oldOptions) {
     joint.options = oldOptions;
 }
 
+function changeJointSpeed(joint, speed) {
+    joint.options.speed = speed;
+}
+
+function changeJointTorque(joint, torque) {
+    joint.options.maxTorque = torque;
+}
+
 function editMode(e) {
     if (STATE.tool === "select") {
         for (let i = 0; i < WORLD.joints.length; i++) {
@@ -1022,6 +1056,16 @@ DOM.jointMenus.jointTypeChangers.forEach(btn => {
         changeJointType(STATE.selectedJoint, type, oldOptions);
         DOM.jointMenus.jointSelectMenu.style.display = "none";
     });
+});
+
+DOM.jointMenus.sliders.speedSlider.addEventListener("input", e => {
+    const settingSpeed = Number(e.target.value);
+    changeJointSpeed(STATE.selectedJoint, settingSpeed);
+});
+
+DOM.jointMenus.sliders.torqueSlider.addEventListener("input", e => {
+    const settingTorque = Number(e.target.value);
+    changeJointTorque(STATE.selectedJoint, settingTorque);
 });
 
 DOM.buttons.delete.addEventListener("click", handleDeleteClick);

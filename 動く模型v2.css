@@ -137,6 +137,11 @@ body{
     background: cyan;
 }
 
+#sliders {
+    display: flex;
+    flex-direction: column;
+}
+
 canvas {
     width: min(100%,800px);
     height: auto;

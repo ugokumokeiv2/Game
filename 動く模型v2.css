@@ -54,6 +54,8 @@ body {
 /* ---------- tool panel ---------- */
 
 .toolPanel {
+    width: 120px;
+
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -65,7 +67,7 @@ body {
     border-radius: 10px;
 }
 
-#editorTool button {
+.toolPanel button {
     width: 100%;
 }
 
@@ -134,38 +136,52 @@ body {
 
 /* ---------- slider ---------- */
 
+#sliders {
+    display: flex;
+    flex-direction: column;
+
+    font-size: 10px;
+    color: var(--text);
+
+    gap: 2px;
+}
+
+#sliders p {
+    margin: 0;
+}
+
 .sliderBox {
-    display:flex;
-    flex-direction:column;
+    display: flex;
+    flex-direction: column;
 
-    gap:4px;
+    gap: 4px;
 
-    margin-bottom:8px;
+    margin-bottom: 8px;
 
-    padding:6px;
+    padding: 6px;
 
-    background:#333;
-    border-radius:6px;
+    background: #333;
+    border-radius: 6px;
 }
 
 .sliderBox p {
-    margin:0;
+    margin: 0;
 }
 
 .sliderLine {
-    display:flex;
-    align-items:center;
+    display: flex;
+    align-items: center;
 
-    gap:8px;
+    gap: 8px;
 }
 
 .sliderLine input {
-    flex:1;
+    flex: 1;
 }
 
 .sliderLine span {
-    width:40px;
-    text-align:right;
+    width: 40px;
+    text-align: right;
 }
 
 
@@ -322,8 +338,9 @@ button {
     }
 
 
-    #editorTool,
-    #runTool {
+    .toolPanel {
+        width:100%;
+
         order:2;
 
         margin-right:0;
@@ -331,6 +348,11 @@ button {
 
         display:grid;
         grid-template-columns:repeat(3,1fr);
+    }
+
+
+    .toolPanel button {
+        width:auto;
     }
 
 
